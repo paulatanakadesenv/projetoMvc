@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using VendasWebMvc.Models;
@@ -44,13 +45,13 @@ namespace VendasWebMvc.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { mensagem = "Id nao fornecido"});
             }
 
             var obj = _servicoVendedor.EncontrarId(id.Value);
             if (obj == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { mensagem = "Id nao existe" });
             }
 
             return View(obj);
@@ -68,13 +69,13 @@ namespace VendasWebMvc.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { mensagem = "Id nao fornecido" });
             }
 
             var obj = _servicoVendedor.EncontrarId(id.Value);
             if (obj == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { mensagem = "Id nao existe" });
             }
 
             return View(obj);
@@ -84,13 +85,13 @@ namespace VendasWebMvc.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { mensagem = "Id nao fornecido" });
             }
 
             var obj = _servicoVendedor.EncontrarId(id.Value);
             if (obj == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { mensagem = "Id nao existe" });
             }
 
             List<Departamento> departamentos = _servicoDepartamento.TodosDepartamentos();
@@ -105,22 +106,27 @@ namespace VendasWebMvc.Controllers
             //verifica se o id e o mesmo id do usuario que esta sendo editado.
             if (id != vendedor.Id)
             {
-                return BadRequest();
+                return RedirectToAction(nameof(Error), new { mensagem = "Id nao corresponde" });
             }
             try
             {
                 _servicoVendedor.Atualizar(vendedor);
                 return RedirectToAction(nameof(Index));
             }
-            catch (NaoEncontrouExcecao)
+            catch (ApplicationException e)
             {
-                return NotFound();
-            }
-            catch (DbExcecaoSimultaniedade)
+                return RedirectToAction(nameof(Error), new { mensagem = e.Message });
+            }    
+        }
+
+        public IActionResult Error(string mensagem) 
+        {
+            var modeloExibicao = new ErrorViewModel
             {
-                return BadRequest();
-            }
-            
+                Message = mensagem,
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            };
+            return View(modeloExibicao);
         }
     }   
 }
