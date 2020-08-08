@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 namespace VendasWebMvc.Models
@@ -8,8 +9,20 @@ namespace VendasWebMvc.Models
     {
         public int Id { get; set; }
         public string Nome { get; set; }
+
+        [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
+
+        // separa os nomes das labels.
+        [Display(Name = "Data Nascimento")]
+        // exibe somente a date sem o horario.
+        [DataType(DataType.Date)]
+        //formata a exibicao de data da forma que quiser.
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
         public DateTime DataNascimento { get; set; }
+
+        //exibi duas casas decimais apos o valor so salario.
+        [DisplayFormat(DataFormatString = "{0:F2}")]
         public double Salario { get; set; }
         public Departamento Departamento { get; set; }
         public int DepartamentoId { get; set; }
