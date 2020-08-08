@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using VendasWebMvc.Models;
 using VendasWebMvc.Models.ViewModels;
 using VendasWebMvc.Servicos;
+using VendasWebMvc.Servicos.Excecoes;
 
 namespace VendasWebMvc.Controllers
 {
@@ -77,6 +78,49 @@ namespace VendasWebMvc.Controllers
             }
 
             return View(obj);
+        }
+
+        public IActionResult Edit(int? id) 
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var obj = _servicoVendedor.EncontrarId(id.Value);
+            if (obj == null)
+            {
+                return NotFound();
+            }
+
+            List<Departamento> departamentos = _servicoDepartamento.TodosDepartamentos();
+            ModeloExibicaoFormularioVendedor modeloExibicao = new ModeloExibicaoFormularioVendedor { Vendedor = obj, Departamentos = departamentos};
+            return View(modeloExibicao);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, Vendedor vendedor) 
+        {
+            //verifica se o id e o mesmo id do usuario que esta sendo editado.
+            if (id != vendedor.Id)
+            {
+                return BadRequest();
+            }
+            try
+            {
+                _servicoVendedor.Atualizar(vendedor);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (NaoEncontrouExcecao)
+            {
+                return NotFound();
+            }
+            catch (DbExcecaoSimultaniedade)
+            {
+                return BadRequest();
+            }
+            
         }
     }   
 }
