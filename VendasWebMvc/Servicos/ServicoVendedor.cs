@@ -4,6 +4,7 @@ using System.Linq;
 using VendasWebMvc.Models;
 using Microsoft.EntityFrameworkCore;
 using VendasWebMvc.Servicos.Excecoes;
+using System.Threading.Tasks;
 
 namespace VendasWebMvc.Servicos
 {
@@ -16,33 +17,35 @@ namespace VendasWebMvc.Servicos
             _context = context;
         }
 
-        public List<Vendedor> TodosVendedores() 
+        public async Task<List<Vendedor>> TodosVendedoresAsync() 
         {
-            return _context.Vendedor.ToList();
+            return await _context.Vendedor.ToListAsync();
         }
 
-        public void Inserir(Vendedor obj)
+        public async Task InserirAsync(Vendedor obj)
         {            
             _context.Add(obj);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public Vendedor EncontrarId(int id) 
+        public async Task<Vendedor> EncontrarIdAsync(int id) 
         {
-            return _context.Vendedor.Include(obj => obj.Departamento).FirstOrDefault(obj => obj.Id == id);
+            return await _context.Vendedor.Include(obj => obj.Departamento).FirstOrDefaultAsync(obj => obj.Id == id);
         }
 
-        public void Remover(int id) 
+        public async Task RemoverAsync(int id) 
         {
-            var obj = _context.Vendedor.Find(id);
+            var obj = await _context.Vendedor.FindAsync(id);
             _context.Vendedor.Remove(obj);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void Atualizar(Vendedor obj) 
+        public async Task AtualizarAsync(Vendedor obj) 
         {
             //Any serve para verificar se existe algum registro do banco de dados com a condicao que for colocado como parametro
-            if (!_context.Vendedor.Any(x => x.Id == obj.Id))
+            bool temAlgum = await _context.Vendedor.AnyAsync(x => x.Id == obj.Id);
+            
+            if (!temAlgum)
             {
                 throw new NaoEncontrouExcecao("Id nao Encontrado");
             }
@@ -50,7 +53,7 @@ namespace VendasWebMvc.Servicos
             try
             {
                 _context.Update(obj);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
             // intercepta uma excecao do nivel de acesso a dados.
             catch (DbExcecaoSimultaniedade e)

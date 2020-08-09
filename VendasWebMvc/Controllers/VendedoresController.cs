@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using VendasWebMvc.Models;
 using VendasWebMvc.Models.ViewModels;
@@ -20,42 +21,42 @@ namespace VendasWebMvc.Controllers
             _servicoDepartamento = servicoDepartamento;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var list = _servicoVendedor.TodosVendedores();
+            var list = await _servicoVendedor.TodosVendedoresAsync();
             return View(list);
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            var departamentos = _servicoDepartamento.TodosDepartamentos();
+            var departamentos = await _servicoDepartamento.TodosDepartamentosAsync();
             var viewModel = new ModeloExibicaoFormularioVendedor { Departamentos = departamentos };
             return View(viewModel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Vendedor vendedor)
+        public async Task<IActionResult> Create(Vendedor vendedor)
         {
             // verifica se p vendedor e valido ou nao
             if (!ModelState.IsValid)
             {
-                var departamentos = _servicoDepartamento.TodosDepartamentos();
+                var departamentos = await _servicoDepartamento.TodosDepartamentosAsync();
                 var modeloExibicao = new ModeloExibicaoFormularioVendedor { Vendedor = vendedor, Departamentos = departamentos };
                 return View(modeloExibicao);
             }
-            _servicoVendedor.Inserir(vendedor);
+            await _servicoVendedor.InserirAsync(vendedor);
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
                 return RedirectToAction(nameof(Error), new { mensagem = "Id nao fornecido"});
             }
 
-            var obj = _servicoVendedor.EncontrarId(id.Value);
+            var obj = await _servicoVendedor.EncontrarIdAsync(id.Value);
             if (obj == null)
             {
                 return RedirectToAction(nameof(Error), new { mensagem = "Id nao existe" });
@@ -66,20 +67,20 @@ namespace VendasWebMvc.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(int id) 
+        public async Task<IActionResult> Delete(int id) 
         {
-            _servicoVendedor.Remover(id);
+            await _servicoVendedor.RemoverAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Details(int? id) 
+        public async Task<IActionResult> Details(int? id) 
         {
             if (id == null)
             {
                 return RedirectToAction(nameof(Error), new { mensagem = "Id nao fornecido" });
             }
 
-            var obj = _servicoVendedor.EncontrarId(id.Value);
+            var obj = await _servicoVendedor.EncontrarIdAsync(id.Value);
             if (obj == null)
             {
                 return RedirectToAction(nameof(Error), new { mensagem = "Id nao existe" });
@@ -88,31 +89,31 @@ namespace VendasWebMvc.Controllers
             return View(obj);
         }
 
-        public IActionResult Edit(int? id) 
+        public async Task<IActionResult> Edit(int? id) 
         {
             if (id == null)
             {
                 return RedirectToAction(nameof(Error), new { mensagem = "Id nao fornecido" });
             }
 
-            var obj = _servicoVendedor.EncontrarId(id.Value);
+            var obj = await _servicoVendedor.EncontrarIdAsync(id.Value);
             if (obj == null)
             {
                 return RedirectToAction(nameof(Error), new { mensagem = "Id nao existe" });
             }
 
-            List<Departamento> departamentos = _servicoDepartamento.TodosDepartamentos();
+            List<Departamento> departamentos = await _servicoDepartamento.TodosDepartamentosAsync();
             ModeloExibicaoFormularioVendedor modeloExibicao = new ModeloExibicaoFormularioVendedor { Vendedor = obj, Departamentos = departamentos};
             return View(modeloExibicao);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, Vendedor vendedor) 
+        public async Task<IActionResult> Edit(int id, Vendedor vendedor) 
         {
             if (!ModelState.IsValid)
             {
-                var departamentos = _servicoDepartamento.TodosDepartamentos();
+                var departamentos = await _servicoDepartamento.TodosDepartamentosAsync();
                 var modeloExibicao = new ModeloExibicaoFormularioVendedor { Vendedor = vendedor, Departamentos = departamentos };
                 return View(modeloExibicao);
             }
@@ -123,7 +124,7 @@ namespace VendasWebMvc.Controllers
             }
             try
             {
-                _servicoVendedor.Atualizar(vendedor);
+                await _servicoVendedor.AtualizarAsync(vendedor);
                 return RedirectToAction(nameof(Index));
             }
             catch (ApplicationException e)
