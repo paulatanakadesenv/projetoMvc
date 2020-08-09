@@ -37,6 +37,13 @@ namespace VendasWebMvc.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Vendedor vendedor)
         {
+            // verifica se p vendedor e valido ou nao
+            if (!ModelState.IsValid)
+            {
+                var departamentos = _servicoDepartamento.TodosDepartamentos();
+                var modeloExibicao = new ModeloExibicaoFormularioVendedor { Vendedor = vendedor, Departamentos = departamentos };
+                return View(modeloExibicao);
+            }
             _servicoVendedor.Inserir(vendedor);
             return RedirectToAction(nameof(Index));
         }
@@ -103,6 +110,12 @@ namespace VendasWebMvc.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, Vendedor vendedor) 
         {
+            if (!ModelState.IsValid)
+            {
+                var departamentos = _servicoDepartamento.TodosDepartamentos();
+                var modeloExibicao = new ModeloExibicaoFormularioVendedor { Vendedor = vendedor, Departamentos = departamentos };
+                return View(modeloExibicao);
+            }
             //verifica se o id e o mesmo id do usuario que esta sendo editado.
             if (id != vendedor.Id)
             {

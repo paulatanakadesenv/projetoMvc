@@ -8,20 +8,34 @@ namespace VendasWebMvc.Models
     public class Vendedor
     {
         public int Id { get; set; }
+
+        // torna obrigatorio o nome/ {0} parametriza pegando o nome do atributo ou seja nesta caso (Nome).
+        [Required(ErrorMessage = "{0} obrigatorio")]
+        // StringLength determina a quantidade minima e maxima de caracter/ErrorMessage mensagem de erro personalizado.
+        [StringLength(60,MinimumLength = 3, ErrorMessage = "O tamanho do {0} deve ter em {2} e {1} caracter")]
         public string Nome { get; set; }
 
+        // torna obrigatorio o nome/ {0} parametriza pegando o nome do atributo ou seja nesta caso (Email).
+        [Required(ErrorMessage = "{0} obrigatorio")]
+        [EmailAddress(ErrorMessage = "Entre com um email valido")]
         [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
 
+        // torna obrigatorio o nome/ {0} parametriza pegando o nome do atributo ou seja nesta caso (DataNascimento).
+        [Required(ErrorMessage = "{0} obrigatorio")]
         // separa os nomes das labels.
         [Display(Name = "Data Nascimento")]
         // exibe somente a date sem o horario.
         [DataType(DataType.Date)]
-        //formata a exibicao de data da forma que quiser.
+        // formata a exibicao de data da forma que quiser.
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
         public DateTime DataNascimento { get; set; }
 
-        //exibi duas casas decimais apos o valor so salario.
+        // torna obrigatorio o nome/ {0} parametriza pegando o nome do atributo ou seja nesta caso (Salario).
+        [Required(ErrorMessage = "{0} obrigatorio")]
+        // deternima a quantidade minima de salario e maxima.
+        [Range(100.0, 50000.0, ErrorMessage = "{0} deve ser de {1} para {2}")]
+        // exibi duas casas decimais apos o valor so salario.
         [DisplayFormat(DataFormatString = "{0:F2}")]
         public double Salario { get; set; }
         public Departamento Departamento { get; set; }
