@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using VendasWebMvc.Models;
 using Microsoft.EntityFrameworkCore;
 using VendasWebMvc.Servicos.Excecoes;

@@ -32,5 +32,27 @@ namespace VendasWebMvc.Servicos
             return await resultado
                 .Include(x => x.Vendedor).Include(x => x.Vendedor.Departamento).OrderByDescending(x => x.Data).ToListAsync();
         }
+
+        public async Task<List<IGrouping<Departamento, RegistroVenda>>> EncontrarAgrupamentoDataAsync(DateTime? dataMinima, DateTime? dataMaxima)
+        {
+            var resultado = from obj in _context.RegistroVenda select obj;
+            if (dataMinima.HasValue)
+            {
+                resultado = resultado.Where(x => x.Data >= dataMinima.Value);
+            }
+
+            if (dataMaxima.HasValue)
+            {
+                resultado = resultado.Where(x => x.Data <= dataMaxima.Value);
+            }
+
+            return await resultado
+                .Include(x => x.Vendedor)
+                .Include(x => x.Vendedor
+                .Departamento).OrderByDescending(x => x.Data)
+                .GroupBy(x => x.Vendedor.Departamento)
+                .ToListAsync();
+        }
+
     }
 }
